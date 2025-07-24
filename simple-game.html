@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Math Game</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .game-option {
+            display: inline-block;
+            margin: 10px;
+            padding: 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 150px;
+        }
+        .game-option:hover {
+            background: #45a049;
+        }
+        #game-screen {
+            display: none;
+            margin-top: 20px;
+        }
+        #question {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Simple Math Game</h1>
+        
+        <div id="game-mode">
+            <h2>Choose Your Game Mode</h2>
+            <div class="game-option" id="math-btn">
+                <h3>Math</h3>
+                <p>Solve math problems</p>
+            </div>
+        </div>
+        
+        <div id="game-screen">
+            <div id="question">What is 2 + 2?</div>
+            <div id="options">
+                <button>3</button>
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+            </div>
+            <div id="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const gameModeEl = document.getElementById('game-mode');
+        const gameScreenEl = document.getElementById('game-screen');
+        const mathBtn = document.getElementById('math-btn');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const feedbackEl = document.getElementById('feedback');
+
+        // Game state
+        let score = 0;
+        let currentLevel = 1;
+
+        // Simple math questions
+        const mathQuestions = [
+            { question: '2 + 2', answer: '4', options: ['3', '4', '5', '6'] },
+            { question: '5 - 3', answer: '2', options: ['1', '2', '3', '4'] },
+            { question: '3 × 4', answer: '12', options: ['7', '12', '15', '20'] },
+            { question: '10 ÷ 2', answer: '5', options: ['2', '5', '8', '10'] },
+            { question: '7 + 8', answer: '15', options: ['12', '13', '14', '15'] }
+        ];
+
+        // Start the math game
+        function startMathGame() {
+            console.log('Starting math game...');
+            gameModeEl.style.display = 'none';
+            gameScreenEl.style.display = 'block';
+            loadMathQuestion();
+        }
+
+        // Load a math question
+        function loadMathQuestion() {
+            const question = mathQuestions[Math.floor(Math.random() * mathQuestions.length)];
+            questionEl.textContent = `What is ${question.question}?`;
+            
+            // Clear previous options
+            optionsEl.innerHTML = '';
+            
+            // Add new options
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = function() {
+                    checkAnswer(option, question.answer);
+                };
+                optionsEl.appendChild(button);
+            });
+            
+            feedbackEl.textContent = '';
+        }
+
+        // Check the answer
+        function checkAnswer(selected, correct) {
+            if (selected === correct) {
+                feedbackEl.textContent = 'Correct! 🎉';
+                feedbackEl.style.color = 'green';
+                score += 10;
+            } else {
+                feedbackEl.textContent = `Wrong! The correct answer is ${correct}`;
+                feedbackEl.style.color = 'red';
+            }
+            
+            // Load next question after a delay
+            setTimeout(loadMathQuestion, 1500);
+        }
+
+        // Event Listeners
+        mathBtn.addEventListener('click', startMathGame);
+        
+        console.log('Game initialized');
+    </script>
+</body>
+</html>

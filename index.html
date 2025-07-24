@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math & Spell Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Math & Spell Adventure</h1>
+            <div class="game-stats">
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">Level: <span id="level">1</span> <span id="level-stars">⭐</span></div>
+                <div class="stat">Time: <span id="timer" class="timer">30</span>s</div>
+                <div class="stat">High Score: <span id="high-score-display">0</span></div>
+                <div class="stat" id="question-counter">Question: 0/0</div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div id="game-mode" class="game-mode">
+                <h2>Choose Your Adventure!</h2>
+                <div class="game-options">
+                    <div class="game-option" onclick="startGame('math')">
+                        <div class="game-icon">➗</div>
+                        <h3>Math Challenge</h3>
+                        <p>Practice addition, subtraction, multiplication, and division!</p>
+                        <div class="high-score">High Score: <span id="math-high-score">0</span></div>
+                    </div>
+                    <div class="game-option" onclick="showSpellingCategories()">
+                        <div class="game-icon">🔤</div>
+                        <h3>Spelling Bee</h3>
+                        <p>Improve your spelling with fun word challenges!</p>
+                        <div class="high-score">High Score: <span id="spelling-high-score">0</span></div>
+                    </div>
+                </div>
+                
+                <div id="spelling-categories" class="spelling-categories hidden">
+                    <h3>Choose a Category</h3>
+                    <div class="category-grid">
+                        <div class="category" data-category="animals">
+                            <span class="category-emoji">🐾</span>
+                            <span>Animals</span>
+                        </div>
+                        <div class="category" data-category="nature">
+                            <span class="category-emoji">🌳</span>
+                            <span>Nature</span>
+                        </div>
+                        <div class="category" data-category="school">
+                            <span class="category-emoji">🏫</span>
+                            <span>School</span>
+                        </div>
+                        <div class="category" data-category="food">
+                            <span class="category-emoji">🍎</span>
+                            <span>Food</span>
+                        </div>
+                        <div class="category" data-category="home">
+                            <span class="category-emoji">🏠</span>
+                            <span>Home</span>
+                        </div>
+                        <div class="category" data-category="random">
+                            <span class="category-emoji">🎲</span>
+                            <span>Random Mix</span>
+                        </div>
+                    </div>
+                    <button onclick="hideSpellingCategories()" class="back-btn">← Back</button>
+                </div>
+            </div>
+            
+            <div id="game-screen" class="hidden">
+                <div id="question" class="question"></div>
+                <div id="options" class="options"></div>
+                <div id="feedback" class="feedback"></div>
+                <button id="next-btn" class="next-btn" onclick="nextQuestion()">Next Question</button>
+            </div>
+            
+            <div id="result-screen" class="hidden">
+                <div class="result-content">
+                    <h2>Game Over!</h2>
+                    <div class="final-stats">
+                        <p>Your score: <span class="score-number" id="final-score">0</span></p>
+                        <p>High score: <span class="score-number" id="high-score">0</span></p>
+                        <p id="new-high-score" class="hidden">🎉 New High Score! 🎉</p>
+                    </div>
+                    <div class="result-actions">
+                        <button onclick="resetGame()" class="btn-primary">Play Again</button>
+                        <button onclick="returnToMenu()" class="btn-secondary">Main Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>1. Choose Math or Spelling</p>
+            <p>2. Answer as many questions as you can!</p>
+            <p>3. Earn points for correct answers</p>
+            <p>4. Try to beat your high score!</p>
+        </div>
+    </div>
+</body>
+</html>

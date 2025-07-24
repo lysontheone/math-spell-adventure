@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Minimal JavaScript Test</h1>
+    <button id="testBtn">Click Me</button>
+    <p id="output">Click the button to test JavaScript</p>
+
+    <script>
+        // Direct inline script - no external dependencies
+        document.getElementById('testBtn').addEventListener('click', function() {
+            document.getElementById('output').textContent = 'JavaScript is working!';
+            console.log('Button was clicked - JavaScript is working');
+            this.textContent = 'It works!';
+        });
+        
+        console.log('Minimal test page loaded');
+    </script>
+
+    <div style="margin-top: 50px; padding: 20px; background: #f0f0f0; border-radius: 5px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <h3>If this doesn't work, please:</h3>
+        <ol style="text-align: left;">
+            <li>Press F12 to open Developer Tools</li>
+            <li>Go to the "Console" tab</li>
+            <li>Look for any red error messages</li>
+            <li>Share what you see with me</li>
+        </ol>
+    </div>
+</body>
+</html>

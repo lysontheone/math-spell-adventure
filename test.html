@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Test</title>
+    <script>
+        function testClick() {
+            alert('Button clicked!');
+            console.log('Test button was clicked');
+        }
+        
+        window.onload = function() {
+            console.log('Test page loaded');
+            document.getElementById('testBtn').onclick = testClick;
+        };
+    </script>
+</head>
+<body>
+    <h1>Game Test Page</h1>
+    <button id="testBtn">Click Me</button>
+    <p>If this button works, the issue is with the game's JavaScript.</p>
+    <p>Check the browser's console (F12) for messages.</p>
+</body>
+</html>
