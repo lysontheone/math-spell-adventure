@@ -283,6 +283,83 @@ function updateHighScoreDisplays() {
 // Track used questions to prevent repetition
 let usedQuestionIndices = new Set();
 
+function initBackButton() {
+    console.log('Initializing back button...');
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
+    
+    if (!backToMenuBtn) {
+        console.error('Back button element not found!');
+        return;
+    }
+    
+    console.log('Back button found:', backToMenuBtn);
+    
+    // Create a new button to replace the old one
+    const newBtn = backToMenuBtn.cloneNode(true);
+    
+    // Add inline styles to ensure visibility
+    newBtn.style.position = 'absolute';
+    newBtn.style.left = '10px';
+    newBtn.style.top = '10px';
+    newBtn.style.zIndex = '1000';
+    newBtn.style.padding = '8px 15px';
+    newBtn.style.backgroundColor = '#4a90e2';
+    newBtn.style.color = 'white';
+    newBtn.style.border = 'none';
+    newBtn.style.borderRadius = '4px';
+    newBtn.style.cursor = 'pointer';
+    
+    // Replace the old button with the new one
+    backToMenuBtn.parentNode.replaceChild(newBtn, backToMenuBtn);
+    
+    // Add click handler
+    newBtn.onclick = function(e) {
+        console.log('Back button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        returnToMainMenu();
+        return false;
+    };
+    
+    // Add touch handler for mobile
+    newBtn.ontouchend = function(e) {
+        console.log('Back button touched!');
+        e.preventDefault();
+        e.stopPropagation();
+        returnToMainMenu();
+        return false;
+    };
+    
+    console.log('Back button initialization complete');
+}
+
+function createEmergencyBackButton() {
+    console.log('Creating emergency back button...');
+    const emergencyBtn = document.createElement('button');
+    emergencyBtn.textContent = '← BACK TO MENU (EMERGENCY)';
+    emergencyBtn.style.position = 'fixed';
+    emergencyBtn.style.top = '10px';
+    emergencyBtn.style.left = '10px';
+    emergencyBtn.style.zIndex = '9999';
+    emergencyBtn.style.padding = '15px 25px';
+    emergencyBtn.style.fontSize = '18px';
+    emergencyBtn.style.backgroundColor = '#ff4444';
+    emergencyBtn.style.color = 'white';
+    emergencyBtn.style.border = '3px solid white';
+    emergencyBtn.style.borderRadius = '8px';
+    emergencyBtn.style.cursor = 'pointer';
+    emergencyBtn.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+    
+    emergencyBtn.onclick = function() {
+        console.log('Emergency back button clicked!');
+        returnToMainMenu();
+        this.remove(); // Remove the button after clicking
+    };
+    
+    document.body.appendChild(emergencyBtn);
+    console.log('Emergency back button added to DOM');
+}
+
 function startGame(mode, category = null) {
     currentGameMode = mode;
     score = 0;
@@ -301,11 +378,24 @@ function startGame(mode, category = null) {
     resultScreenEl.classList.add('hidden');
     gameScreenEl.classList.remove('hidden');
     
+    // Add emergency back button
+    createEmergencyBackButton();
+    
     // Load first question
     loadQuestion();
 }
 
 function loadQuestion() {
+    console.log('Loading question...');
+    console.log('Current game mode:', currentGameMode);
+    console.log('Current level:', currentLevel);
+    
+    // Ensure DOM elements are properly initialized
+    if (!feedbackEl) {
+        console.error('feedbackEl is not defined');
+        feedbackEl = document.getElementById('feedback') || document.createElement('div');
+    }
+    
     // Clear any existing feedback
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
@@ -514,45 +604,102 @@ function loadSpellingQuestion(question) {
 
 function checkAnswer(selected, correct) {
     const isCorrect = selected === correct;
+    const buttons = optionsEl.querySelectorAll('button');
+    
+    // Disable all buttons immediately
+    buttons.forEach(btn => btn.disabled = true);
     
     if (isCorrect) {
-        score += 10 * currentLevel; // More points for higher levels
+        // Calculate points with streak bonus
+        const basePoints = 10 * currentLevel;
+        const streakBonus = Math.min(20, (currentStreak || 0) * 2); // Max 20 point bonus
+        const pointsEarned = basePoints + streakBonus;
+        
+        // Update score and streak
+        score += pointsEarned;
+        currentStreak = (currentStreak || 0) + 1;
+        
+        // Update high scores
+        if (currentGameMode === 'math') {
+            highScores.math = Math.max(highScores.math || 0, score);
+            highScores.bestStreak = Math.max(highScores.bestStreak || 0, currentStreak);
+            highScores.lastPlayed = new Date().toISOString();
+            localStorage.setItem('highScores', JSON.stringify(highScores));
+            updateHighScoreDisplays();
+        }
+        
+        // Update UI
         updateScore();
-        feedbackEl.textContent = 'Correct! 🎉';
+        feedbackEl.textContent = `Correct! +${pointsEarned} points! 🎉`;
         feedbackEl.className = 'feedback correct';
         
-        // Play sound effect
+        // Play sound effect with volume control
         if (sounds.correct) {
+            sounds.correct.volume = 0.6;
             sounds.correct.currentTime = 0;
             sounds.correct.play().catch(e => console.log('Audio play failed:', e));
         }
         
-        // Add visual feedback
-        feedbackEl.style.animation = 'none';
-        feedbackEl.offsetHeight; // Trigger reflow
-        feedbackEl.style.animation = 'bounce 0.5s';
+        // Visual feedback for correct answer
+        const selectedButton = Array.from(buttons).find(btn => btn.textContent === selected);
+        if (selectedButton) {
+            selectedButton.classList.add('correct');
+            selectedButton.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                selectedButton.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        // Show confetti for streaks of 5 or more
+        if (currentStreak >= 5) {
+            triggerConfetti();
+            if (currentStreak % 5 === 0) {
+                // Play level up sound for every 5 in a row
+                if (sounds.levelUp) {
+                    sounds.levelUp.volume = 0.7;
+                    sounds.levelUp.currentTime = 0;
+                    sounds.levelUp.play().catch(console.error);
+                }
+                feedbackEl.textContent += `\n${currentStreak} in a row! Amazing!`;
+            }
+        }
     } else {
+        // Handle incorrect answer
+        currentStreak = 0; // Reset streak on wrong answer
         feedbackEl.textContent = `Incorrect. The correct answer is: ${correct}`;
         feedbackEl.className = 'feedback incorrect';
         
-        // Play sound effect
+        // Play wrong answer sound
         if (sounds.wrong) {
+            sounds.wrong.volume = 0.4;
             sounds.wrong.currentTime = 0;
-            sounds.wrong.play().catch(e => console.log('Audio play failed:', e));
+            sounds.wrong.play().catch(console.error);
         }
+        
+        // Visual feedback for incorrect answer
+        const selectedButton = Array.from(buttons).find(btn => btn.textContent === selected);
+        const correctButton = Array.from(buttons).find(btn => btn.textContent === correct);
+        
+        if (selectedButton) selectedButton.classList.add('incorrect');
+        if (correctButton) correctButton.classList.add('correct');
     }
     
-    // Disable all option buttons
-    const buttons = optionsEl.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.disabled = true;
-        if (button.textContent === correct && !isCorrect) {
-            button.classList.add('correct');
-        }
-    });
+    // Show next button with animation
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = 'inline-block';
+    nextBtn.style.animation = 'pulse 1.5s infinite';
     
-    // Show next button
-    document.getElementById('next-btn').style.display = 'inline-block';
+    // Update streak display if it exists
+    const streakDisplay = document.getElementById('streak-display');
+    if (streakDisplay) {
+        streakDisplay.textContent = `🔥 ${currentStreak}`;
+        if (currentStreak > 0) {
+            streakDisplay.style.display = 'inline-block';
+            streakDisplay.style.animation = 'pulse 1s infinite';
+        } else {
+            streakDisplay.style.animation = 'none';
+        }
+    }
 }
 
 function nextQuestion() {
@@ -680,8 +827,51 @@ function returnToMenu() {
     updateHighScoreDisplays();
 }
 
-// Initialize the game when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+// Function to return to main menu
+function returnToMainMenu() {
+    // Reset game state
+    stopTimer();
+    resetGame();
+    
+    // Show main menu and hide other screens
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.add('hidden');
+    });
+    gameModeEl.classList.remove('hidden');
+    
+    // Update high scores
+    updateHighScoreDisplays();
+}
+
+// Initialize the game when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Add click handler for the main header to return to the main menu
+    const mainHeader = document.getElementById('main-header');
+    if (mainHeader) {
+        mainHeader.addEventListener('click', returnToMainMenu);
+    }
+    
+    // Add click handler for the back to menu button with better event handling
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
+    if (backToMenuBtn) {
+        backToMenuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Back to menu button clicked');
+            returnToMainMenu();
+            return false;
+        });
+        
+        // Also add a separate handler for touch events on mobile
+        backToMenuBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Back to menu button touched');
+            returnToMainMenu();
+            return false;
+        });
+    }
+
     console.log('DOM fully loaded, initializing game...');
     
     // Initialize DOM elements
@@ -701,8 +891,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const spellingOption = document.querySelector('.game-option:last-child');
     
     if (mathOption) {
-        mathOption.onclick = function() {
+        mathOption.onclick = function(e) {
+            // Prevent default in case it's a link
+            if (e) e.preventDefault();
+            
             console.log('Math option clicked');
+            console.log('Starting math game...');
+            
+            // Hide the game mode selection
+            if (gameModeEl) gameModeEl.style.display = 'none';
+            
+            // Show the game screen
+            if (gameScreenEl) {
+                gameScreenEl.classList.remove('hidden');
+                console.log('Game screen shown');
+            } else {
+                console.error('Game screen element not found');
+            }
+            
+            // Start the math game
             startGame('math');
         };
     }

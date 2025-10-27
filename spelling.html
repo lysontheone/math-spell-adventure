@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee - Math & Spell Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header" id="main-header">
+            <h1>Spelling Bee</h1>
+            <div class="game-stats">
+                <div class="stat">High Score: <span id="high-score-display">0</span></div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div id="setup-screen" class="setup">
+                <h2>Choose Difficulty</h2>
+                <div class="setup-row">
+                    <label for="difficulty-select">Difficulty:</label>
+                    <select id="difficulty-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="setup-row">
+                    <label for="words-count">Words per game:</label>
+                    <select id="words-count">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <button id="start-spelling-btn" class="btn">Start</button>
+            </div>
+
+            <div id="game-screen" class="hidden">
+                <!-- Direct HTML Link Back to Menu -->
+                <a href="index.html" class="direct-back-button">
+                    ← Back to Menu
+                </a>
+                
+                <div class="game-header">
+                    <div class="stat">Score: <span id="score">0</span></div>
+                    <div class="stat">Word: <span id="word-count">0/0</span></div>
+                    <div class="stat">Streak: <span id="streak">0</span></div>
+                </div>
+                
+                <div id="question-container">
+                    <div id="question-text"></div>
+                    <div class="spelling-input-container">
+                        <input type="text" id="spelling-input" placeholder="Type the word here..." autocomplete="off">
+                        <button id="check-btn" class="btn">Check</button>
+                    </div>
+                    <div id="answer-feedback" class="feedback"></div>
+                    <button id="next-btn" class="btn hidden">Next Word</button>
+                </div>
+                
+                <div id="result-screen" class="hidden">
+                    <h2>Game Over!</h2>
+                    <div class="result-stats">
+                        <p>Final Score: <span id="final-score">0</span></p>
+                        <p>High Score: <span id="final-high-score">0</span></p>
+                        <p id="new-high-score" class="hidden">🎉 New High Score! 🎉</p>
+                    </div>
+                    <div class="result-actions">
+                        <button id="play-again-btn" class="btn">Play Again</button>
+                        <button id="menu-btn" class="btn">Main Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>1. Read the hint and the number of letters</p>
+            <p>2. Type the correct spelling of the word</p>
+            <p>3. Click "Check" or press Enter</p>
+            <p>4. Get points for correct answers and build your streak!</p>
+        </div>
+    </div>
+
+    <script src="spelling-fix.js"></script>
+</body>
+</html>

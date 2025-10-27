@@ -5,18 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math & Spell Adventure</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="game.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Game Mode Configuration -->
+    <script src="gameModes.js" type="module"></script>
+    
+    <!-- Core Game Logic -->
+    <script src="game.js" type="module"></script>
+    <script src="spelling-fix.js" type="module"></script>
+    
+    <!-- Authentication and User Management -->
+    <script src="auth.js" type="module"></script>
+    
+    <!-- Game Mode Management -->
+    <script src="gameModeManager.js" type="module"></script>
 </head>
 <body>
     <div class="game-container">
-        <div class="header">
+        <div id="game-selection" class="screen">
+            <h1>Math & Spell Adventure</h1>
+            <div class="game-modes">
+                <!-- Game mode buttons will be added here by JavaScript -->
+            </div>
+            <div id="mode-description" class="mode-description">
+                <p>Select a game mode to begin your adventure!</p>
+            </div>
+        </div>
+        
+        <div id="practice-categories" class="screen hidden">
+            <h2>Practice Categories</h2>
+            <div class="category-grid">
+                <!-- Categories will be added by JavaScript -->
+            </div>
+            <button id="back-to-modes" class="back-btn">← Back to Modes</button>
+        </div>
+        
+        <div class="header" id="main-header">
             <h1>Math & Spell Adventure</h1>
             <div class="game-stats">
-                <div class="stat">Score: <span id="score">0</span></div>
-                <div class="stat">Level: <span id="level">1</span> <span id="level-stars">⭐</span></div>
-                <div class="stat">Time: <span id="timer" class="timer">30</span>s</div>
                 <div class="stat">High Score: <span id="high-score-display">0</span></div>
-                <div class="stat" id="question-counter">Question: 0/0</div>
             </div>
         </div>
         
@@ -24,70 +50,53 @@
             <div id="game-mode" class="game-mode">
                 <h2>Choose Your Adventure!</h2>
                 <div class="game-options">
-                    <div class="game-option" onclick="startGame('math')">
+                    <div class="game-option" id="math-option">
                         <div class="game-icon">➗</div>
                         <h3>Math Challenge</h3>
-                        <p>Practice addition, subtraction, multiplication, and division!</p>
+                        <p>Practice addition, subtraction, and multiplication!</p>
                         <div class="high-score">High Score: <span id="math-high-score">0</span></div>
                     </div>
-                    <div class="game-option" onclick="showSpellingCategories()">
+                    <a href="spelling.html" class="game-option" id="spelling-option" style="text-decoration: none; color: inherit;">
                         <div class="game-icon">🔤</div>
                         <h3>Spelling Bee</h3>
                         <p>Improve your spelling with fun word challenges!</p>
                         <div class="high-score">High Score: <span id="spelling-high-score">0</span></div>
-                    </div>
+                    </a>
+                </div>
+            </div>
+
+            <div id="game-screen" class="hidden">
+                <!-- Direct HTML Link Back to Menu -->
+                <a href="index.html" class="direct-back-button">
+                    ← Back to Menu
+                </a>
+                
+                <div class="game-header">
+                    <button id="back-to-menu-btn" class="back-to-menu-btn" title="Back to Main Menu">
+                        ← Menu
+                    </button>
+                    <div class="stat">Score: <span id="score">0</span></div>
+                    <div class="stat">Question: <span id="question-counter">0/0</span></div>
+                    <div class="stat">Streak: <span id="streak">0</span></div>
                 </div>
                 
-                <div id="spelling-categories" class="spelling-categories hidden">
-                    <h3>Choose a Category</h3>
-                    <div class="category-grid">
-                        <div class="category" data-category="animals">
-                            <span class="category-emoji">🐾</span>
-                            <span>Animals</span>
-                        </div>
-                        <div class="category" data-category="nature">
-                            <span class="category-emoji">🌳</span>
-                            <span>Nature</span>
-                        </div>
-                        <div class="category" data-category="school">
-                            <span class="category-emoji">🏫</span>
-                            <span>School</span>
-                        </div>
-                        <div class="category" data-category="food">
-                            <span class="category-emoji">🍎</span>
-                            <span>Food</span>
-                        </div>
-                        <div class="category" data-category="home">
-                            <span class="category-emoji">🏠</span>
-                            <span>Home</span>
-                        </div>
-                        <div class="category" data-category="random">
-                            <span class="category-emoji">🎲</span>
-                            <span>Random Mix</span>
-                        </div>
-                    </div>
-                    <button onclick="hideSpellingCategories()" class="back-btn">← Back</button>
+                <div id="question-container">
+                    <div id="question-text"></div>
+                    <div id="options-container"></div>
+                    <div id="answer-feedback" class="hidden"></div>
+                    <button id="next-btn" class="btn hidden">Next Question</button>
                 </div>
-            </div>
-            
-            <div id="game-screen" class="hidden">
-                <div id="question" class="question"></div>
-                <div id="options" class="options"></div>
-                <div id="feedback" class="feedback"></div>
-                <button id="next-btn" class="next-btn" onclick="nextQuestion()">Next Question</button>
-            </div>
-            
-            <div id="result-screen" class="hidden">
-                <div class="result-content">
+                
+                <div id="result-screen" class="hidden">
                     <h2>Game Over!</h2>
-                    <div class="final-stats">
-                        <p>Your score: <span class="score-number" id="final-score">0</span></p>
-                        <p>High score: <span class="score-number" id="high-score">0</span></p>
+                    <div class="result-stats">
+                        <p>Final Score: <span id="final-score">0</span></p>
+                        <p>High Score: <span id="final-high-score">0</span></p>
                         <p id="new-high-score" class="hidden">🎉 New High Score! 🎉</p>
                     </div>
                     <div class="result-actions">
-                        <button onclick="resetGame()" class="btn-primary">Play Again</button>
-                        <button onclick="returnToMenu()" class="btn-secondary">Main Menu</button>
+                        <button id="play-again-btn" class="btn">Play Again</button>
+                        <button id="menu-btn" class="btn">Main Menu</button>
                     </div>
                 </div>
             </div>
@@ -101,5 +110,489 @@
             <p>4. Try to beat your high score!</p>
         </div>
     </div>
+
+    <div id="confetti-canvas"></div>
+    
+    <script>
+        // Sound effects
+        const sounds = {
+            correct: new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'),
+            wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/1109/1109-preview.mp3'),
+            levelUp: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
+            gameOver: new Audio('https://assets.mixkit.co/active_storage/sfx/1433/1433-preview.mp3'),
+            click: new Audio('https://assets.mixkit.co/active_storage/sfx/2474/2474-preview.mp3')
+        };
+
+        // Game state
+        let currentGameMode = '';
+        let score = 0;
+        let currentQuestion = 0;
+        let highScores = JSON.parse(localStorage.getItem('mathSpellHighScores')) || {
+            math: 0,
+            spelling: 0,
+            mathQuestions: 0,
+            spellingWords: 0,
+            bestStreak: 0,
+            lastPlayed: null
+        };
+        
+        // Set volume for all sounds
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0.5; // 50% volume
+        });
+        let questions = [];
+        let currentStreak = 0;
+        
+        // Initialize game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load high scores from localStorage
+            const mathHighScore = localStorage.getItem('mathHighScore') || 0;
+            const spellingHighScore = localStorage.getItem('spellingHighScore') || 0;
+            
+            document.getElementById('math-high-score').textContent = mathHighScore;
+            document.getElementById('spelling-high-score').textContent = spellingHighScore;
+            document.getElementById('high-score-display').textContent = Math.max(mathHighScore, spellingHighScore);
+            
+            // Add event listeners
+            document.getElementById('math-option').addEventListener('click', (e) => {
+                e.preventDefault();
+                startGame('math');
+            });
+            
+            // No need for click handler on spelling-option as it's now a direct link
+            
+            // Update high scores when returning from spelling game
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('from') === 'spelling') {
+                const newHighScore = localStorage.getItem('spellingHighScore') || 0;
+                document.getElementById('spelling-high-score').textContent = newHighScore;
+                document.getElementById('high-score-display').textContent = Math.max(
+                    parseInt(document.getElementById('math-high-score').textContent) || 0,
+                    parseInt(newHighScore) || 0
+                );
+                // Remove the parameter from URL without refreshing
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Add event listeners for game controls
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const menuBtn = document.getElementById('menu-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (playAgainBtn) {
+                playAgainBtn.addEventListener('click', () => startGame(currentGameMode));
+            }
+            if (menuBtn) {
+                menuBtn.addEventListener('click', showMainMenu);
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', loadNextQuestion);
+            }
+        });
+        
+        function showMainMenu() {
+            document.getElementById('game-mode').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+        }
+        
+        function startGame(gameMode) {
+            currentGameMode = gameMode;
+            score = 0;
+            currentQuestion = 0;
+            questions = []; // Clear any existing questions
+            
+            // Update UI
+            document.getElementById('score').textContent = score;
+            document.getElementById('game-mode').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            
+            // Load first question
+            loadQuestion();
+        }
+        
+        function loadQuestion() {
+            const questionContainer = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            
+            // Generate a new question on the fly
+            const questionData = generateMathQuestion();
+            
+            // Update the question display
+            questionContainer.textContent = questionData.question;
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Create option buttons
+            questionData.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, questionData.answer);
+                optionsContainer.appendChild(button);
+            });
+            
+            // Update question counter (now shows total questions answered)
+            document.getElementById('question-counter').textContent = 
+                `Question ${currentQuestion + 1}`;
+                
+            // Increment the question counter for the next question
+            currentQuestion++;
+        }
+        
+        // Generate a single math question with options
+        function generateMathQuestion() {
+            const difficulties = [
+                // Level 1: Basic addition and subtraction (1-10)
+                {
+                    operations: ['+', '-'],
+                    min: 1,
+                    max: 10,
+                    points: 1
+                },
+                // Level 2: Addition and subtraction with larger numbers (1-20)
+                {
+                    operations: ['+', '-'],
+                    min: 1,
+                    max: 20,
+                    points: 2
+                },
+                // Level 3: Multiplication (1-10)
+                {
+                    operations: ['*'],
+                    min: 1,
+                    max: 10,
+                    points: 3
+                },
+                // Level 4: All operations with larger numbers (1-20)
+                {
+                    operations: ['+', '-', '*'],
+                    min: 5,
+                    max: 20,
+                    points: 4
+                },
+                // Level 5: Division and larger numbers
+                {
+                    operations: ['/'],
+                    min: 2,
+                    max: 12,
+                    points: 5
+                }
+            ];
+            
+            // Determine difficulty based on number of questions answered
+            const level = Math.min(Math.floor(currentQuestion / 10), 4);
+            const difficulty = difficulties[level];
+            
+            // Add more operation types based on level
+            let availableOperations = [...difficulty.operations];
+            if (level >= 2) {
+                availableOperations.push('**'); // Exponents for higher levels
+                if (level >= 3) {
+                    availableOperations.push('%'); // Modulo for advanced levels
+                }
+            }
+            
+            const operation = availableOperations[Math.floor(Math.random() * availableOperations.length)];
+            
+            let num1, num2, question, answer;
+            
+            // Generate appropriate numbers based on operation
+            switch(operation) {
+                case '+':
+                    num1 = getRandomInt(difficulty.min, difficulty.max);
+                    num2 = getRandomInt(difficulty.min, difficulty.max);
+                    question = `${num1} + ${num2} = ?`;
+                    answer = (num1 + num2).toString();
+                    break;
+                case '-':
+                    num1 = getRandomInt(difficulty.min * 2, difficulty.max * 2);
+                    num2 = getRandomInt(difficulty.min, num1);
+                    question = `${num1} - ${num2} = ?`;
+                    answer = (num1 - num2).toString();
+                    break;
+                case '*':
+                    num1 = getRandomInt(difficulty.min, difficulty.max);
+                    num2 = getRandomInt(difficulty.min, difficulty.max);
+                    question = `${num1} × ${num2} = ?`;
+                    answer = (num1 * num2).toString();
+                    break;
+                case '/':
+                    num2 = getRandomInt(difficulty.min, difficulty.max);
+                    const multiplier = getRandomInt(difficulty.min, 5);
+                    answer = num2.toString();
+                    num1 = num2 * multiplier;
+                    question = `${num1} ÷ ${multiplier} = ?`;
+                    answer = num2.toString();
+                    break;
+                case '**':
+                    num1 = getRandomInt(1, 5);
+                    num2 = getRandomInt(2, 3);
+                    question = `${num1}^${num2} = ?`;
+                    answer = Math.pow(num1, num2).toString();
+                    break;
+                case '%':
+                    num1 = getRandomInt(10, 50);
+                    num2 = getRandomInt(2, 10);
+                    question = `${num1} % ${num2} = ?`;
+                    answer = (num1 % num2).toString();
+                    break;
+            }
+            
+            // Generate options based on difficulty
+            const options = [answer];
+            const range = Math.max(10, parseInt(answer) * 0.5);
+            
+            while (options.length < 4) {
+                let option;
+                if (Math.random() > 0.5) {
+                    // Generate a number close to the answer
+                    const offset = getRandomInt(1, Math.max(2, range/2));
+                    option = (parseInt(answer) + (Math.random() > 0.5 ? offset : -offset)).toString();
+                } else {
+                    // Generate a completely random number in range
+                    option = getRandomInt(1, difficulty.max * 2).toString();
+                }
+                
+                // Ensure the option is positive and unique
+                if (!options.includes(option) && option !== answer && parseInt(option) > 0) {
+                    options.push(option);
+                }
+            }
+            
+            // Shuffle options
+            shuffleArray(options);
+            
+            return {
+                question: question,
+                answer: answer,
+                options: options,
+                points: difficulty.points,
+                level: level + 1
+            };
+        }
+        
+        function checkAnswer(selected, correct) {
+            const isCorrect = selected === correct;
+            const feedback = document.getElementById('answer-feedback');
+            
+            if (isCorrect) {
+                score += 10 + (currentStreak * 2); // Base 10 points + streak bonus
+                currentStreak++;
+                feedback.textContent = 'Correct! 🎉';
+                feedback.className = 'feedback correct';
+            } else {
+                currentStreak = 0;
+                feedback.textContent = `Incorrect. The correct answer is: ${correct}`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            // Update score display
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = currentStreak;
+            
+            // Show feedback and next button
+            feedback.classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+        
+        function loadNextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+        
+        function endGame() {
+            // Update high score if needed
+            const highScoreKey = `${currentGameMode}HighScore`;
+            const currentHighScore = parseInt(localStorage.getItem(highScoreKey) || '0');
+            
+            if (score > currentHighScore) {
+                localStorage.setItem(highScoreKey, score);
+                document.getElementById('new-high-score').classList.remove('hidden');
+            }
+            
+            // Update result screen
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-high-score').textContent = Math.max(score, currentHighScore);
+            
+            // Show result screen
+            document.getElementById('question-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+        }
+        
+        // Math question generator with different difficulty levels
+        function generateMathQuestions(count) {
+            const questions = [];
+            const difficulties = [
+                // Level 1: Basic addition and subtraction (1-10)
+                {
+                    operations: ['+', '-'],
+                    min: 1,
+                    max: 10,
+                    points: 1
+                },
+                // Level 2: Addition and subtraction with larger numbers (1-20)
+                {
+                    operations: ['+', '-'],
+                    min: 1,
+                    max: 20,
+                    points: 2
+                },
+                // Level 3: Multiplication (1-10)
+                {
+                    operations: ['*'],
+                    min: 1,
+                    max: 10,
+                    points: 3
+                },
+                // Level 4: All operations with larger numbers (1-20)
+                {
+                    operations: ['+', '-', '*'],
+                    min: 5,
+                    max: 20,
+                    points: 4
+                },
+                // Level 5: Division and larger numbers
+                {
+                    operations: ['/'],
+                    min: 2,
+                    max: 12,
+                    points: 5
+                }
+            ];
+
+            for (let i = 0; i < count; i++) {
+                // Get a random difficulty level
+                const level = i < 10 ? Math.floor(i / 3) : Math.min(4, Math.floor(i / 10) + 1);
+                const difficulty = difficulties[level];
+                const operation = difficulty.operations[Math.floor(Math.random() * difficulty.operations.length)];
+                
+                let num1, num2, question, answer;
+                
+                // Generate appropriate numbers based on operation
+                switch(operation) {
+                    case '+':
+                        num1 = getRandomInt(difficulty.min, difficulty.max);
+                        num2 = getRandomInt(difficulty.min, difficulty.max);
+                        question = `${num1} + ${num2} = ?`;
+                        answer = (num1 + num2).toString();
+                        break;
+                    case '-':
+                        num1 = getRandomInt(difficulty.min * 2, difficulty.max * 2);
+                        num2 = getRandomInt(difficulty.min, num1);
+                        question = `${num1} - ${num2} = ?`;
+                        answer = (num1 - num2).toString();
+                        break;
+                    case '*':
+                        num1 = getRandomInt(difficulty.min, difficulty.max);
+                        num2 = getRandomInt(difficulty.min, difficulty.max);
+                        question = `${num1} × ${num2} = ?`;
+                        answer = (num1 * num2).toString();
+                        break;
+                    case '/':
+                        num2 = getRandomInt(difficulty.min, difficulty.max);
+                        const multiplier = getRandomInt(difficulty.min, 5);
+                        answer = num2.toString();
+                        num1 = num2 * multiplier;
+                        question = `${num1} ÷ ${multiplier} = ?`;
+                        answer = num2.toString();
+                        break;
+                }
+                
+                // Generate options based on difficulty
+                const options = [answer];
+                const range = Math.max(10, parseInt(answer) * 0.5);
+                
+                while (options.length < 4) {
+                    let option;
+                    if (Math.random() > 0.5) {
+                        // Generate a number close to the answer
+                        const offset = getRandomInt(1, Math.max(2, range/2));
+                        option = (parseInt(answer) + (Math.random() > 0.5 ? offset : -offset)).toString();
+                    } else {
+                        // Generate a completely random number in range
+                        option = getRandomInt(1, difficulty.max * 2).toString();
+                    }
+                    
+                    // Ensure the option is positive and unique
+                    if (!options.includes(option) && option !== answer && parseInt(option) > 0) {
+                        options.push(option);
+                    }
+                }
+                
+                // Shuffle options
+                shuffleArray(options);
+                
+                questions.push({
+                    question: question,
+                    answer: answer,
+                    options: options,
+                    points: difficulty.points,
+                    level: level + 1
+                });
+            }
+            
+            return questions;
+        }
+        
+        // Helper function to get a random integer in range [min, max]
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        // Helper function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function generateSpellingQuestions(count) {
+            const words = [
+                { word: 'apple', hint: 'A common red or green fruit' },
+                { word: 'banana', hint: 'A yellow curved fruit' },
+                { word: 'computer', hint: 'An electronic device for processing data' },
+                { word: 'elephant', hint: 'A large gray mammal with a trunk' },
+                { word: 'guitar', hint: 'A musical instrument with strings' },
+                { word: 'mountain', hint: 'A large natural elevation of the earth\'s surface' },
+                { word: 'rainbow', hint: 'A meteorological phenomenon that is caused by reflection, refraction and dispersion of light' },
+                { word: 'sunshine', hint: 'Direct sunlight unbroken by cloud' },
+                { word: 'watermelon', hint: 'A large melon with a hard, green rind and sweet watery pink or reddish flesh' },
+                { word: 'zebra', hint: 'An African wild horse with black-and-white stripes' }
+            ];
+            
+            // Make sure we don't exceed the number of available words
+            const selectedWords = words.slice(0, Math.min(count, words.length));
+            
+            return selectedWords.map(item => {
+                // For spelling, we'll show the hint and expect the word as answer
+                const options = [item.word];
+                
+                // Add some incorrect options (other words from the list)
+                while (options.length < 4) {
+                    const randomWord = words[Math.floor(Math.random() * words.length)].word;
+                    if (!options.includes(randomWord)) {
+                        options.push(randomWord);
+                    }
+                }
+                
+                // Shuffle options
+                options.sort(() => Math.random() - 0.5);
+                
+                return {
+                    question: `<p>${item.hint}</p><p>Spell the word:</p>`,
+                    answer: item.word,
+                    options: options
+                };
+            });
+        }
+
+        // Expose functions for external modules (e.g., GameModeManager)
+        window.startGame = startGame;
+        window.showMainMenu = showMainMenu;
+        window.loadNextQuestion = loadNextQuestion;
+    </script>
 </body>
 </html>
